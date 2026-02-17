@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JayVox</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: black;
+  color: white;
+}
+
+header {
+  background: linear-gradient(90deg, #000, #b30000);
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 0 20px red;
+}
+
+header img {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.search-box {
+  padding: 15px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+}
+
+.category-title {
+  padding: 10px 15px;
+  font-size: 22px;
+  color: #ff4d4d;
+}
+
+.song-card {
+  margin: 12px 15px;
+  padding: 15px;
+  border-radius: 18px;
+  background: #111;
+  box-shadow: 0 0 12px red;
+}
+
+.song-top {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.song-top img {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.song-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.play-count {
+  font-size: 13px;
+  margin-top: 6px;
+  color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="images/logo.jpg">
+  <h1>JayVox</h1>
+</header>
+
+<div class="search-box">
+  <input type="text" id="search" placeholder="Search songs...">
+</div>
+
+<div id="songs-container"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyACzipenb7Sx0-XsNF8xiNCEE8uIeOsXuU",
+  authDomain: "jayvox-be536.firebaseapp.com",
+  databaseURL: "https://jayvox-be536-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "jayvox-be536",
+  storageBucket: "jayvox-be536.firebasestorage.app",
+  messagingSenderId: "427814511964",
+  appId: "1:427814511964:web:e8a16e2e2275ef1d160d99"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
+
+<script>
+let songsData = [];
+
+fetch("songs.json")
+.then(res => res.json())
+.then(data => {
+  songsData = data;
+  displaySongs(data);
+});
+
+function displaySongs(data) {
+  const container = document.getElementById("songs-container");
+  container.innerHTML = "";
+
+  const categories = {};
+
+  data.forEach(song => {
+    if (!categories[song.category]) {
+      categories[song.category] = [];
+    }
+    categories[song.category].push(song);
+  });
+
+  Object.keys(categories).forEach(category => {
+    const title = document.createElement("div");
+    title.className = "category-title";
+    title.innerText = category;
+    container.appendChild(title);
+
+    categories[category].forEach(song => {
+      const card = document.createElement("div");
+      card.className = "song-card";
+
+      const playId = "play-" + song.title.replace(/\s/g,'');
+
+      card.innerHTML = `
+        <div class="song-top">
+          <img src="images/${song.image}">
+          <div>
+            <div class="song-title">${song.title}</div>
+            <audio controls src="songs/${song.file}" id="${playId}"></audio>
+            <div class="play-count" id="count-${playId}">Played 0 times</div>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+
+      setupCounter(song.title, playId);
+    });
+  });
+}
+
+function setupCounter(title, playId) {
+  const audio = document.getElementById(playId);
+  const countBox = document.getElementById("count-" + playId);
+
+  let counted = false;
+
+  audio.addEventListener("timeupdate", function () {
+    if (!counted && audio.currentTime > 1) {
+      counted = true;
+      increasePlay(title);
+    }
+  });
+
+  const ref = db.ref("plays/" + title);
+  ref.on("value", snap => {
+    countBox.innerText = "Played " + (snap.val() || 0) + " times";
+  });
+}
+
+function increasePlay(title) {
+  const ref = db.ref("plays/" + title);
+  ref.transaction(count => (count || 0) + 1);
+}
+
+document.getElementById("search").addEventListener("input", function() {
+  const q = this.value.toLowerCase();
+  const filtered = songsData.filter(s => 
+    s.title.toLowerCase().includes(q) || 
+    s.category.toLowerCase().includes(q)
+  );
+  displaySongs(filtered);
+});
+</script>
+
+</body>
+</html>
