@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JayVox</title>
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+body{
+ margin:0;
+ font-family:Arial;
+ background:#000;
+ color:white;
+}
+
+header{
+ display:flex;
+ align-items:center;
+ background:linear-gradient(to right,#000,#8b0000);
+ padding:12px;
+}
+
+header img{
+ height:55px;
+ margin-right:10px;
+}
+
+.search-box{
+ padding:12px;
+}
+
+.search-box input{
+ width:100%;
+ padding:10px;
+ border-radius:8px;
+ border:none;
+}
+
+.category{
+ padding:12px 15px;
+ font-size:20px;
+ color:#ff4d4d;
+ font-weight:bold;
+}
+
+.song{
+ display:flex;
+ background:#111;
+ margin:10px 15px;
+ padding:12px;
+ border-radius:12px;
+ border-left:4px solid red;
+}
+
+.song img{
+ width:65px;
+ height:65px;
+ border-radius:10px;
+ margin-right:12px;
+}
+
+.song-info{
+ flex:1;
+}
+
+.counter{
+ font-size:12px;
+ color:#aaa;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<img src="images/logo.jpg">
+<h2>JayVox</h2>
+</header>
+
+<div class="search-box">
+<input id="search" placeholder="Search songs..." onkeyup="searchSongs()">
+</div>
+
+<div id="songs"></div>
+
+<script>
+fetch('songs.json')
+.then(res=>res.json())
+.then(data=>{
+
+ let container=document.getElementById('songs');
+
+ let grouped={};
+
+ data.forEach(song=>{
+   if(!grouped[song.category]){
+     grouped[song.category]=[];
+   }
+   grouped[song.category].push(song);
+ });
+
+ for(let category in grouped){
+
+   container.innerHTML+=`<div class="category">${category}</div>`;
+
+   grouped[category].forEach(song=>{
+     container.innerHTML+=`
+     <div class="song" data-name="${song.title.toLowerCase()} ${song.category.toLowerCase()}">
+       <img src="images/${song.image}">
+       <div class="song-info">
+         <b>${song.title}</b><br>
+         Category: ${song.category}<br>
+         <audio controls onplay="countPlay('${song.file}')">
+           <source src="songs/${song.file}" type="audio/mpeg">
+         </audio>
+         <div class="counter" id="count-${song.file}">
+           Played 0 times
+         </div>
+       </div>
+     </div>`;
+   });
+
+ }
+
+});
+
+function searchSongs(){
+ let input=document.getElementById("search").value.toLowerCase();
+ let songs=document.getElementsByClassName("song");
+
+ for(let s of songs){
+  s.style.display=s.dataset.name.includes(input)?"":"none";
+ }
+}
+
+function countPlay(id){
+ let count=localStorage.getItem("play_"+id) || 0;
+ count++;
+ localStorage.setItem("play_"+id,count);
+ document.getElementById("count-"+id).innerText="Played "+count+" times";
+}
+</script>
+
+</body>
+</html>
