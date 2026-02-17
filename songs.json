@@ -5,10 +5,10 @@
     "image": "raato-raani.jpg",
     "category": "Nepali"
   },
-  {
-    "title": "Example",
-    "file": "https://drive.google.com/uc?export=open&id=19RGXTI08A3Q03F0ztXfa1xi5Iz2UNAGg",
-    "image": "Type-C.jpg",
-    "category": "Nepali"
-  }
+{
+  "title": "Example",
+  "file": "https://drive.google.com/uc?export=open&id=19RGXTI08A3Q03F0ztXfa1xi5Iz2UNAGg",
+  "image": "Type-C.jpg",
+  "category": "Nepali"
+}
 ]
