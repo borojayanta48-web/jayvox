@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JayVox - My Karaoke Collection</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #000;
+    color: white;
+}
+
+header {
+    background: linear-gradient(to right, #000, #8B0000);
+    padding: 20px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.container {
+    padding: 15px;
+}
+
+.song {
+    display: flex;
+    align-items: center;
+    background: #111;
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    border-left: 4px solid red;
+}
+
+.song img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    margin-right: 12px;
+}
+
+.song-info {
+    flex: 1;
+}
+
+.song-title {
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+audio {
+    width: 100%;
+}
+</style>
+</head>
+
+<body>
+
+<header>🎤 JayVox</header>
+
+<div class="container">
+
+<!-- SONG 1 -->
+<div class="song">
+    <img src="images/song1.jpg" alt="Album Art">
+    <div class="song-info">
+        <div class="song-title">Song Name 1</div>
+        <audio controls>
+            <source src="songs/song1.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+</div>
+
+<!-- SONG 2 -->
+<div class="song">
+    <img src="images/song2.jpg" alt="Album Art">
+    <div class="song-info">
+        <div class="song-title">Song Name 2</div>
+        <audio controls>
+            <source src="songs/song2.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>
