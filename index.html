@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JayVox</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: black;
+  color: white;
+}
+
+header {
+  background: linear-gradient(90deg,#000,#b30000);
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 0 20px red;
+}
+
+header img {
+  width: 60px;
+  border-radius: 12px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.search-box {
+  padding: 15px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+}
+
+.category-title {
+  padding: 10px 15px;
+  font-size: 22px;
+  color: #ff4d4d;
+}
+
+.song-card {
+  margin: 12px 15px;
+  padding: 15px;
+  border-radius: 18px;
+  background: #111;
+  box-shadow: 0 0 12px red;
+}
+
+.song-top {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.song-top img {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.song-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.play-count {
+  font-size: 13px;
+  margin-top: 6px;
+  color: #aaa;
+}
+
+/* ABOUT SECTION */
+
+.about-section {
+  margin-top: 60px;
+  padding: 40px 20px;
+  background: #111;
+  text-align: center;
+  box-shadow: 0 0 25px red inset;
+}
+
+.about-section img {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid red;
+  box-shadow: 0 0 20px red;
+  margin-bottom: 20px;
+}
+
+.about-section h2 {
+  color: #ff4d4d;
+  margin-bottom: 20px;
+}
+
+.about-text {
+  max-width: 750px;
+  margin: auto;
+  line-height: 1.8;
+  color: #ddd;
+  font-size: 15px;
+}
+
+.social-links {
+  margin-top: 25px;
+}
+
+.social-links a {
+  display: inline-block;
+  margin: 8px;
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  color: white;
+  background: #b30000;
+  box-shadow: 0 0 12px red;
+  transition: 0.3s;
+}
+
+.social-links a:hover {
+  background: red;
+  transform: scale(1.05);
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: #888;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="images/logo.jpg">
+  <h1>JayVox</h1>
+</header>
+
+<div class="search-box">
+  <input type="text" id="search" placeholder="Search songs...">
+</div>
+
+<div id="songs-container"></div>
+
+<!-- ABOUT SECTION AT BOTTOM -->
+
+<div class="about-section">
+  <img src="images/aboutphoto.jpg" alt="Jayanta Boro">
+  <h2>About Jayanta</h2>
+
+  <div class="about-text">
+    <p><strong>Jayanta Boro</strong> is an independent music enthusiast and passionate singer from Assam, India. Through JayVox, he shares his dedication to music with listeners who appreciate heartfelt and emotional performances.</p>
+
+    <p>From Hindi melodies and Nepali classics to English songs, Jayanta enjoys exploring different musical styles while constantly improving his vocal skills. Singing is not just a hobby — it is a journey of growth, creativity, and expression.</p>
+
+    <p>JayVox represents his evolving musical journey. Every recording reflects effort, consistency, and the dream of building a recognizable digital music identity.</p>
+  </div>
+
+  <div class="social-links">
+    <a href="https://www.facebook.com/share/1aBLmYQrMR/" target="_blank">Facebook</a>
+    <a href="https://twitter.com/iamjayantaboro" target="_blank">X (@iamjayantaboro)</a>
+  </div>
+</div>
+
+<footer>
+  © 2026 JayVox. All Rights Reserved.
+</footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyACzipenb7Sx0-XsNF8xiNCEE8uIeOsXuU",
+  authDomain: "jayvox-be536.firebaseapp.com",
+  databaseURL: "https://jayvox-be536-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "jayvox-be536",
+  storageBucket: "jayvox-be536.firebasestorage.app",
+  messagingSenderId: "427814511964",
+  appId: "1:427814511964:web:e8a16e2e2275ef1d160d99"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
+
+<script>
+let songsData = [];
+
+fetch("songs.json")
+.then(res => res.json())
+.then(data => {
+  songsData = data;
+  displaySongs(data);
+});
+
+function displaySongs(data) {
+  const container = document.getElementById("songs-container");
+  container.innerHTML = "";
+
+  const categories = {};
+
+  data.forEach(song => {
+    if (!categories[song.category]) {
+      categories[song.category] = [];
+    }
+    categories[song.category].push(song);
+  });
+
+  Object.keys(categories).forEach(category => {
+    const title = document.createElement("div");
+    title.className = "category-title";
+    title.innerText = category;
+    container.appendChild(title);
+
+    categories[category].forEach(song => {
+      const card = document.createElement("div");
+      card.className = "song-card";
+
+      const playId = "play-" + song.title.replace(/\s/g,'');
+
+      card.innerHTML = `
+        <div class="song-top">
+          <img src="images/${song.image}">
+          <div>
+            <div class="song-title">${song.title}</div>
+            <audio controls src="songs/${song.file}" id="${playId}"></audio>
+            <div class="play-count" id="count-${playId}">Played 0 times</div>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+      setupCounter(song.title, playId);
+    });
+  });
+}
+
+function setupCounter(title, playId) {
+  const audio = document.getElementById(playId);
+  const countBox = document.getElementById("count-" + playId);
+
+  let counted = false;
+
+  audio.addEventListener("timeupdate", function () {
+    if (!counted && audio.currentTime > 1) {
+      counted = true;
+      increasePlay(title);
+    }
+  });
+
+  const ref = db.ref("plays/" + title);
+  ref.on("value", snap => {
+    countBox.innerText = "Played " + (snap.val() || 0) + " times";
+  });
+}
+
+function increasePlay(title) {
+  const ref = db.ref("plays/" + title);
+  ref.transaction(count => (count || 0) + 1);
+}
+
+document.getElementById("search").addEventListener("input", function() {
+  const q = this.value.toLowerCase();
+  const filtered = songsData.filter(s => 
+    s.title.toLowerCase().includes(q) || 
+    s.category.toLowerCase().includes(q)
+  );
+  displaySongs(filtered);
+});
+</script>
+
+</body>
+</html>
