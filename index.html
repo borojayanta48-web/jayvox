@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>JayVox.in</title>
+
+<link rel="icon" href="images/favicon.ico">
+
+<!-- ===== Artist SEO ===== -->
+<script type="application/ld+json">
+{
+ "@context":"https://schema.org",
+ "@type":"Person",
+ "name":"Jayanta Boro",
+ "alternateName":"JayVox",
+ "url":"https://jayvox.in",
+ "image":"https://jayvox.in/images/aboutphoto.jpg",
+ "jobTitle":"Singer",
+ "sameAs":[
+   "https://www.facebook.com/share/1aBLmYQrMR/",
+   "https://x.com/iamjayantaboro"
+ ]
+}
+</script>
+
+<style>
+
+body{
+background:#000;
+color:#fff;
+font-family:Arial;
+margin:0;
+}
+
+header{
+display:flex;
+align-items:center;
+gap:15px;
+padding:15px;
+background:linear-gradient(to right,#200000,#b30000);
+}
+
+header img{
+width:65px;
+border-radius:12px;
+}
+
+.search{
+padding:15px;
+}
+
+.search input{
+width:100%;
+padding:15px;
+border-radius:25px;
+border:none;
+font-size:18px;
+}
+
+.category{
+color:#ff6b6b;
+padding-left:15px;
+}
+
+.song{
+background:#111;
+margin:15px;
+padding:15px;
+border-radius:15px;
+box-shadow:0 0 25px rgba(255,0,0,.4);
+}
+
+.song img{
+width:90px;
+border-radius:10px;
+}
+
+audio{
+width:100%;
+margin-top:10px;
+}
+
+.playcount{
+opacity:.7;
+margin-top:6px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<img src="images/logo.jpg">
+<h1>JayVox.in</h1>
+</header>
+
+<div class="search">
+<input id="searchBox" placeholder="Search songs...">
+</div>
+
+<div id="songs"></div>
+
+<!-- ===== FIREBASE ===== -->
+<script type="module">
+
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+runTransaction
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyACzipenb7Sx0-XsNF8xiNCEE8uIeOsXuU",
+authDomain:"jayvox-be536.firebaseapp.com",
+databaseURL:"https://jayvox-be536-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"jayvox-be536",
+storageBucket:"jayvox-be536.firebasestorage.app",
+messagingSenderId:"427814511964",
+appId:"1:427814511964:web:e8a16e2e2275ef1d160d99"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+async function loadSongs(){
+
+const res=await fetch("songs.json");
+const songs=await res.json();
+
+const container=document.getElementById("songs");
+container.innerHTML="";
+
+let categories={};
+
+songs.forEach(song=>{
+if(!categories[song.category])
+categories[song.category]=[];
+categories[song.category].push(song);
+});
+
+for(let cat in categories){
+
+const catTitle=document.createElement("h2");
+catTitle.className="category";
+catTitle.innerText=cat;
+container.appendChild(catTitle);
+
+categories[cat].forEach(song=>{
+
+const audioSrc=
+song.file.startsWith("http")
+? song.file
+: "songs/"+song.file;
+
+const slug=song.title
+.toLowerCase()
+.replace(/\s+/g,"-");
+
+const card=document.createElement("div");
+card.className="song";
+
+card.innerHTML=`
+<h3 onclick="openSong('${slug}')">${song.title}</h3>
+<img src="images/${song.image}">
+<audio controls src="${audioSrc}"></audio>
+<div class="playcount">Played 0 times</div>
+`;
+
+container.appendChild(card);
+
+const audio=card.querySelector("audio");
+const counter=card.querySelector(".playcount");
+
+let counted=false;
+
+audio.addEventListener("play",()=>{
+
+if(counted) return;
+counted=true;
+
+const playRef=ref(db,"plays/"+slug);
+
+runTransaction(playRef,(val)=>{
+return (val||0)+1;
+}).then(res=>{
+counter.innerText="Played "+res.snapshot.val()+" times";
+});
+
+});
+
+});
+
+}
+
+}
+
+window.openSong=function(slug){
+window.location.href="song.html?song="+slug;
+};
+
+loadSongs();
+
+</script>
+
+</body>
+</html>
