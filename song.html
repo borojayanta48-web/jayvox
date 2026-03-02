@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>JayVox Song</title>
+
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#000;
+color:white;
+text-align:center;
+}
+
+/* HEADER */
+header{
+display:flex;
+align-items:center;
+gap:15px;
+padding:15px;
+background:linear-gradient(90deg,#000,#8b0000);
+}
+
+header img{
+width:60px;
+height:60px;
+border-radius:12px;
+}
+
+header h1{
+margin:0;
+font-size:28px;
+}
+
+/* CONTENT */
+.container{
+padding:30px 15px;
+}
+
+.cover{
+width:220px;
+height:220px;
+object-fit:cover;
+border-radius:15px;
+margin-bottom:20px;
+box-shadow:0 0 20px red;
+}
+
+audio{
+width:90%;
+max-width:400px;
+margin-top:15px;
+}
+
+.back{
+display:inline-block;
+margin-top:30px;
+padding:12px 25px;
+background:#b22222;
+color:white;
+text-decoration:none;
+border-radius:8px;
+font-weight:bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+<img src="images/logo.jpg">
+<h1>JayVox</h1>
+</header>
+
+<div class="container">
+
+<h2 id="title">Loading...</h2>
+
+<img id="cover" class="cover">
+
+<br>
+
+<audio id="player" controls></audio>
+
+<br>
+
+<a href="index.html" class="back">← Back to Home</a>
+
+</div>
+
+<script>
+
+/* GET SONG FROM URL */
+const params = new URLSearchParams(window.location.search);
+let slug = params.get("song");
+
+if(!slug){
+document.getElementById("title").innerText="Song not found";
+throw new Error("No song");
+}
+
+slug = slug.replace("/","");
+
+/* LOAD SONGS */
+fetch("songs.json")
+.then(r=>r.json())
+.then(songs=>{
+
+const song = songs.find(s =>
+s.title.toLowerCase()
+.replace(/\s+/g,"-") === slug
+);
+
+if(!song){
+document.getElementById("title").innerText="Song not found";
+return;
+}
+
+/* SET DATA */
+document.getElementById("title").innerText=song.title;
+
+document.getElementById("cover").src=
+"images/"+song.image;
+
+document.getElementById("player").src=
+"songs/"+song.file;
+
+});
+
+</script>
+
+</body>
+</html>
