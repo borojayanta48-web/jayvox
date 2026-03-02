@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>JayVox - Official Music</title>
+
+<link rel="icon" href="images/favicon.ico">
+
+<style>
+
+body{
+margin:0;
+background:black;
+font-family:Arial;
+color:white;
+}
+
+header{
+background:linear-gradient(90deg,#2b0000,#b30000);
+padding:20px;
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+header img{
+width:60px;
+height:60px;
+border-radius:12px;
+}
+
+h1{margin:0;font-size:32px;}
+
+.search{
+padding:15px;
+}
+
+input{
+width:100%;
+padding:15px;
+border-radius:25px;
+border:none;
+font-size:18px;
+}
+
+.category{
+color:#ff6b6b;
+padding:10px 20px;
+font-size:26px;
+}
+
+.song{
+background:#0b0b0b;
+margin:15px;
+padding:20px;
+border-radius:20px;
+box-shadow:0 0 15px rgba(255,0,0,.4);
+}
+
+.song img{
+width:80px;
+height:80px;
+border-radius:10px;
+margin-right:15px;
+}
+
+.row{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.song-title{
+font-size:22px;
+margin-bottom:10px;
+cursor:pointer;
+}
+
+audio{
+width:100%;
+margin-top:10px;
+}
+
+.count{
+margin-top:8px;
+opacity:.7;
+}
+
+footer{
+text-align:center;
+padding:40px;
+opacity:.6;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<img src="images/logo.jpg">
+<h1>JayVox</h1>
+</header>
+
+<div class="search">
+<input id="search" placeholder="Search songs...">
+</div>
+
+<div id="songs"></div>
+
+<footer>
+<a href="about.html" style="color:white;">About Jayanta</a>
+</footer>
+
+<!-- Firebase -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyACzipenb7Sx0-XsNF8xiNCEE8uIeOsXuU",
+authDomain:"jayvox-be536.firebaseapp.com",
+databaseURL:"https://jayvox-be536-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"jayvox-be536",
+storageBucket:"jayvox-be536.firebasestorage.app",
+messagingSenderId:"427814511964",
+appId:"1:427814511964:web:e8a16e2e2275ef1d160d99"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const container=document.getElementById("songs");
+const search=document.getElementById("search");
+
+fetch("songs.json")
+.then(r=>r.json())
+.then(data=>render(data));
+
+function slug(title){
+return title.toLowerCase().replace(/\s+/g,"-");
+}
+
+function render(list){
+
+container.innerHTML="";
+
+const grouped={};
+
+list.forEach(song=>{
+if(!grouped[song.category]) grouped[song.category]=[];
+grouped[song.category].push(song);
+});
+
+Object.keys(grouped).forEach(cat=>{
+
+const h=document.createElement("div");
+h.className="category";
+h.textContent=cat;
+container.appendChild(h);
+
+grouped[cat].forEach(song=>{
+
+const s=document.createElement("div");
+s.className="song";
+
+const id=slug(song.title);
+
+s.innerHTML=`
+<div class="song-title">${song.title}</div>
+<div class="row">
+<img src="images/${song.image}">
+</div>
+<audio controls src="songs/${song.file}"></audio>
+<div class="count" id="count-${id}">
+Played 0 times
+</div>
+`;
+
+container.appendChild(s);
+
+/* ✅ FIXED LINK (NO / BEFORE SLUG) */
+s.querySelector(".song-title").onclick=()=>{
+window.location.href=
+"song.html?song="+encodeURIComponent(id);
+};
+
+const audio=s.querySelector("audio");
+
+audio.addEventListener("play",()=>{
+
+if(audio.counted) return;
+audio.counted=true;
+
+const playRef=ref(db,"plays/"+id);
+
+runTransaction(playRef,val=>(val||0)+1);
+
+});
+
+});
+
+});
+
+}
+
+search.oninput=e=>{
+fetch("songs.json")
+.then(r=>r.json())
+.then(data=>{
+const q=e.target.value.toLowerCase();
+render(data.filter(s=>s.title.toLowerCase().includes(q)));
+});
+};
+
+</script>
+
+</body>
+</html>
