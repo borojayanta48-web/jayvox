@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>JayVox Song</title>
+<link rel="icon" href="favicon.ico">
+
+<style>
+body{
+background:black;
+color:white;
+font-family:Arial;
+text-align:center;
+padding:20px;
+}
+
+img{
+width:220px;
+border-radius:12px;
+box-shadow:0 0 15px red;
+}
+
+audio{
+width:100%;
+margin-top:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1 id="title">Loading...</h1>
+
+<img id="cover">
+
+<br>
+
+<audio id="player" controls></audio>
+
+<br><br>
+
+<a href="/">⬅ Back to JayVox</a>
+
+<script>
+
+async function loadSong(){
+
+let slug =
+new URLSearchParams(location.search).get("song");
+
+if(!slug){
+slug = location.pathname.replace("/","");
+}
+
+const res = await fetch("/songs.json");
+const songs = await res.json();
+
+const song = songs.find(
+s=>s.title.toLowerCase().replace(/\s+/g,'-')===slug
+);
+
+if(!song){
+document.body.innerHTML="<h2>Song not found</h2>";
+return;
+}
+
+document.title = song.title+" | JayVox";
+
+document.getElementById("title").innerText=song.title;
+document.getElementById("cover").src="/images/"+song.image;
+document.getElementById("player").src=song.file;
+
+}
+
+loadSong();
+
+</script>
+
+</body>
+</html>
