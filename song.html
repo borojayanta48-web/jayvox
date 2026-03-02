@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>JayVox Song</title>
+
+<link rel="icon" href="images/favicon.ico">
+
+<style>
+
+body{
+background:black;
+color:white;
+font-family:Arial;
+margin:0;
+}
+
+header{
+background:linear-gradient(90deg,#000,#b30000);
+padding:20px;
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+header img{
+width:60px;
+border-radius:12px;
+}
+
+.container{
+text-align:center;
+padding:30px;
+}
+
+img.cover{
+width:220px;
+border-radius:15px;
+}
+
+audio{
+width:100%;
+margin-top:20px;
+}
+
+.back{
+margin-top:30px;
+display:inline-block;
+background:#b30000;
+padding:12px 25px;
+border-radius:10px;
+color:white;
+text-decoration:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<img src="images/logo.jpg">
+<h1>JayVox</h1>
+</header>
+
+<div class="container">
+
+<h2 id="title">Loading...</h2>
+
+<img id="cover" class="cover">
+
+<br>
+
+<audio id="player" controls></audio>
+
+<br>
+
+<a class="back" href="index.html">← Back to Home</a>
+
+</div>
+
+<script>
+
+const params=new URLSearchParams(window.location.search);
+const slug=params.get("song");
+
+fetch("songs.json")
+.then(r=>r.json())
+.then(data=>{
+
+const song=data.find(s=>
+s.title.toLowerCase()
+.replace(/[^a-z0-9]+/g,'-')
+.replace(/(^-|-$)/g,'')===slug
+);
+
+if(!song){
+document.getElementById("title").innerText="Song not found";
+return;
+}
+
+document.getElementById("title").innerText=song.title;
+document.getElementById("cover").src="images/"+song.image;
+document.getElementById("player").src=song.file;
+
+});
+
+</script>
+
+</body>
+</html>
