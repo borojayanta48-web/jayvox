@@ -1,43 +1,43 @@
 [
   {
     "title": "Mayabini",
-    "file": "Mayabini.mp3",
+    "file": "songs/Mayabini.mp3",
     "image": "Mayabini.jpg",
     "category": "Assamese"
   },
   {
     "title": "Dil Pe Tere Pyaar",
-    "file": "Dil-Pe-Tere-Pyaar.mp3",
+    "file": "songs/Dil-Pe-Tere-Pyaar.mp3",
     "image": "Dil-Pe-Tere-Pyaar.jpg",
     "category": "Hindi"
   },
   {
     "title": "Endhar Hobo Nuwaru",
-    "file": "Endhar-Hobo-Nuwaru.mp3",
+    "file": "songs/Endhar-Hobo-Nuwaru.mp3",
     "image": "Endhar-Hobo-Nuwaru.jpg",
     "category": "Assamese"
   },
   {
     "title": "Dill Deewana",
-    "file": "Dill-Deewana.mp3",
+    "file": "songs/Dill-Deewana.mp3",
     "image": "Dill-Deewana.jpg",
     "category": "Hindi"
   },
   {
     "title": "O Sanam",
-    "file": "O-Sanam.mp3",
+    "file": "songs/O-Sanam.mp3",
     "image": "O-Sanam.jpg",
     "category": "Hindi"
   },
   {
     "title": "Raato Raani",
-    "file": "raato-raani.mp3",
+    "file": "songs/raato-raani.mp3",
     "image": "raato-raani.jpg",
     "category": "Nepali"
   },
   {
     "title": "Dhoom Tere Ishq Ki",
-    "file": "Dhoom-Tere-Ishq-Ki.mp3",
+    "file": "songs/Dhoom-Tere-Ishq-Ki.mp3",
     "image": "Dhoom-Tere-Ishq-Ki.jpg",
     "category": "Hindi"
   }
